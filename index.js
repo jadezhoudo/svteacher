@@ -1,21 +1,23 @@
 const express = require("express");
+const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 
+// Enable CORS for all routes
+app.use(cors());
+
 // Proxy configuration
 app.use(
-  "/api", // Route for your frontend to call
+  "/api",
   createProxyMiddleware({
-    target: "https://api-icc.ican.vn", // Backend API URL
-    changeOrigin: true, // Change the origin of the host header to the target URL
+    target: "https://api-icc.ican.vn",
+    changeOrigin: true,
     pathRewrite: { "^/api": "" }, // Remove "/api" prefix when forwarding the request
     onProxyReq: (proxyReq, req, res) => {
-      // Optionally, modify requests before they are sent to the backend
       console.log("Proxying request:", req.method, req.url);
     },
     onProxyRes: (proxyRes, req, res) => {
-      // Optionally, log or modify the response
       console.log("Received response with status:", proxyRes.statusCode);
     },
   })
