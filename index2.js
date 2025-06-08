@@ -1,18 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const serverless = require("serverless-http");
 
 const app = express();
 
+// Enable CORS for all routes
 app.use(cors());
 
+// Proxy configuration
 app.use(
   "/api",
   createProxyMiddleware({
     target: "https://api-icc.ican.vn",
     changeOrigin: true,
-    pathRewrite: { "^/api": "" },
+    pathRewrite: { "^/api": "" }, // Remove "/api" prefix when forwarding the request
     onProxyReq: (proxyReq, req, res) => {
       console.log("Proxying request:", req.method, req.url);
     },
@@ -22,6 +23,8 @@ app.use(
   })
 );
 
-// Không dùng app.listen()
-
-module.exports.handler = serverless(app);
+// Start the proxy server
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Proxy server is running at http://localhost:${PORT}`);
+});
